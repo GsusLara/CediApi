@@ -1,10 +1,15 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+import pandas as pd
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
-def datos():
-    return "hola mundo"
+
+@app.route('/recepcion', methods=['POST'])
+def upload():
+    file = request.files['file'] #se carga el archivo en la variable
+    df = pd.read_excel(file)# se convierte en dataframe pro medio de pandas
+    data = df.to_dict()#se convierte el df en diccionario
+    return jsonify(data)# se responde en formato json
 
 
 if __name__ == '__main__':
