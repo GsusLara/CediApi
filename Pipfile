@@ -5,8 +5,15 @@ name = "pypi"
 
 [packages]
 flask = "*"
+pandas = "*"
+openpyxl = "*"
+xlrd = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.11"
+
+[scripts]
+start="flask run -p 3245 -h 0.0.0.0"
