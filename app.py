@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pandas as pd
 import mysql.connector
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"])
 
 @app.route('/', methods = ['GET'])
 def page():
@@ -42,7 +44,7 @@ def upload():
         mydb.close()
         return jsonify(reponse),200
     else:
-        return jsonify({"error": "No hay archivos para procesar."})
+        return jsonify({"error": "No hay archivos para procesar."}),400
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=3245, debug=True)

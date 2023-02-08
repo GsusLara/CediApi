@@ -12,6 +12,7 @@ recepción = recibe unos Archivos de Excel especificos y carga la informacion ne
 ## Composición del proyecto
 
 * flask 
+* flask-cors
 * pandas 
 * openpyxl 
 * xlrd 
