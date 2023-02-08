@@ -2,24 +2,20 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import mysql.connector
 
-mydb = mysql.connector.connect(
-  host="10.14.11.71",
-  user="root",
-  password="PassworD",
-  database="cediSoporte"
-)
-consulta = mydb.cursor()
 app = Flask(__name__)
 
 @app.route('/', methods = ['GET'])
 def page():
     return("<H1>pagina web de la api</H1>")
 
-
 @app.route('/recepcion', methods=['POST'])
 def upload():
+    #Recibe y analiza si existen archivos
     files = request.files.getlist('file')
-    if files:#si existen archivos
+    if files:
+    #inicia la conexion con la BD
+        mydb = mysql.connector.connect(host="10.14.11.71",user="root",password="PassworD",database="cediSoporte")
+        consulta = mydb.cursor()
         reponse = []
         for i in files:#Itera la lista de archivos xls
     #bloque codigo para cargar las datos de la acción en la tabla de la bd
@@ -32,21 +28,21 @@ def upload():
                 df = df.iloc[:-2]#elimina las ultimas dos lineas del dataframe ya que no son informacion útil
                 cantidadEquipos = (len(df))#toma la cantidad de equipos
                 consulta.execute(f'INSERT INTO Acciones (IdAccion,  CantidadEquipos) VALUES (\'{numeroAccion}\', {cantidadEquipos});')
-                mydb.commit()
     #bloque de codigo para cargar los equipos en la tabla de la bd
                 df['Placa'] = df['Placa'].astype(int)#convierte la columna placa en datos enteros
                 descripcion = list(df['Descripción'])#crea una lista con la descripción
                 placa = list(df['Placa'])#crea una lista con los numeros de placa
                 serie = list(df['Número Serie'])#crea una lista con los numeros de serie
                 equipos = list(zip(descripcion, placa, serie))#unifica los datos en una lista de tuplas
-                reponse.append(f"Se cargó como {numeroAccion}")
-            else:
-                reponse.append("ya esta en bd")
-                
-            
-        return (reponse)
+                for computadora in equipos:
+                    consulta.execute(f'INSERT INTO Equipos (Placa, Serie, Descripcion, IdAccion) VALUES ({computadora[1]},"{computadora[2]}", "{computadora[0]}","{numeroAccion}");')
+                reponse.append(numeroAccion)
+        mydb.commit()
+        consulta.close()
+        mydb.close()
+        return jsonify(reponse),200
     else:
-        return jsonify({"error": "No hay archivos para procesar."})# Si no hay archivos para procesar, devuelve un error
+        return jsonify({"error": "No hay archivos para procesar."})
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=3245, debug=True)
