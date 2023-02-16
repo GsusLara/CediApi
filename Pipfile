@@ -8,8 +8,9 @@ flask = "*"
 pandas = "*"
 openpyxl = "*"
 xlrd = "*"
-mysql-connector-python = "*"
 flask-cors = "*"
+flask-mysql = "*"
+flask-mysqldb = "*"
 
 [dev-packages]
 
